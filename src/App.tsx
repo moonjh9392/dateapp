@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
-import { createClient, type Session } from '@supabase/supabase-js'
+import type { Session } from '@supabase/supabase-js'
+import { supabase } from './utils/supabase'
 import { ArrowLeft, ArrowRight, Check, Clock3, Heart, LockKeyhole, LogOut, MessageCircle, Popcorn, Send, Utensils, Wifi, WifiOff } from 'lucide-react'
 
 type Restaurant = { id: string; name: string; category: string; description: string; emoji: string; featured?: boolean }
@@ -13,9 +14,6 @@ const restaurants: Restaurant[] = [
   { id: 'jackpasta', name: '잭파스타 & 커피', category: '뇨끼 · 파스타', description: '포근한 파스타와 커피 한 잔', emoji: '🍝' },
 ]
 const restaurantById = new Map(restaurants.map((place) => [place.id, place]))
-const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
-const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
-const supabase = url && key ? createClient(url, key) : null
 const homeUrl = import.meta.env.BASE_URL
 
 export default function App() {
