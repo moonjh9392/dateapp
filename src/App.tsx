@@ -15,6 +15,37 @@ const restaurants: Restaurant[] = [
 ]
 const restaurantById = new Map(restaurants.map((place) => [place.id, place]))
 const homeUrl = import.meta.env.BASE_URL
+const mealDurationMinutes = 90
+const movieBufferMinutes = 30
+
+function formatPlanTime(minutesAfterMidnight: number) {
+  const hours = Math.floor(minutesAfterMidnight / 60) % 24
+  const minutes = minutesAfterMidnight % 60
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+}
+
+function ItineraryTimeline({ restaurantId, movie }: { restaurantId: string; movie: boolean | null }) {
+  const place = restaurantById.get(restaurantId)
+  const badagotArrival = 17 * 60 + 20
+  const walk = place?.walkMinutes ?? 0
+  const restaurantArrival = badagotArrival + walk
+  const mealEnd = restaurantArrival + mealDurationMinutes
+  const movieStart = mealEnd + movieBufferMinutes
+  const steps = [
+    { time: '17:00', title: '회사 출발', detail: '택시 이동' },
+    { time: formatPlanTime(badagotArrival), title: '바다곶 도착', detail: '택시 약 20분' },
+    ...(walk ? [{ time: formatPlanTime(restaurantArrival), title: `${place?.name} 도착`, detail: `바다곶에서 도보 약 ${walk}분` }] : []),
+    { time: formatPlanTime(mealEnd), title: '식사 마무리', detail: '식사 약 90분 예상' },
+  ]
+
+  return <section className="itinerary-card" aria-label="예상 데이트 시간표">
+    <div className="itinerary-heading"><span>🕰️</span><strong>예상 시간표</strong><span className="itinerary-caption">바다곶 기준</span></div>
+    <ol className="itinerary-list">{steps.map((step) => <li className="itinerary-step" key={`${step.time}-${step.title}`}><time>{step.time}</time><span className="itinerary-dot"/><div><strong>{step.title}</strong><small>{step.detail}</small></div></li>)}
+      <li className={`itinerary-step ${movie === false ? 'itinerary-muted' : 'itinerary-movie'}`}><time>{movie === false ? '—' : formatPlanTime(movieStart)}</time><span className="itinerary-dot"/><div><strong>{movie === false ? '영화는 이번엔 패스' : movie === true ? '영화 시작 예상' : '영화 선택 시 시작 예상'}</strong><small>{movie === false ? '식사 후 자유 일정' : `식사 후 30분 여유 · 치이카와 극장판`}</small></div></li>
+    </ol>
+    <p className="itinerary-note">식사와 영화 시각은 예상 일정이야. 실제 상영 시간에 맞춰 조정하면 돼.</p>
+  </section>
+}
 
 export default function App() {
   const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1'
@@ -50,7 +81,7 @@ function VotingPage() {
       <div className="hero-doodle doodle-one">✳</div><div className="hero-doodle doodle-two">♡</div>
     </section>
 
-    {submitted ? <section className="success-card" role="status"><span className="success-icon"><Check size={26} /></span><div className="eyebrow">CHOICE SENT</div><h2>선택 완료!</h2><p>{restaurantById.get(restaurant)?.name}에서 밥 먹고 {movie ? '영화도 같이' : '산책하며'} 즐거운 시간 보내자 💛</p><div className="sent-summary"><span>{restaurantById.get(restaurant)?.emoji} {restaurantById.get(restaurant)?.name}</span><span>{movie ? '🎬 영화 볼래!' : '🌙 영화는 다음에'}</span></div></section> : <form onSubmit={submit} className="form-content">
+    {submitted ? <><section className="success-card" role="status"><span className="success-icon"><Check size={26} /></span><div className="eyebrow">CHOICE SENT</div><h2>선택 완료!</h2><p>{restaurantById.get(restaurant)?.name}에서 밥 먹고 {movie ? '영화도 같이' : '산책하며'} 즐거운 시간 보내자 💛</p><div className="sent-summary"><span>{restaurantById.get(restaurant)?.emoji} {restaurantById.get(restaurant)?.name}</span><span>{movie ? '🎬 영화 볼래!' : '🌙 영화는 다음에'}</span></div></section><ItineraryTimeline restaurantId={restaurant} movie={movie} /></> : <form onSubmit={submit} className="form-content">
       <section className="selection-section" aria-labelledby="restaurant-title">
         <div className="section-heading"><div className="section-number">01</div><div><span className="section-kicker">FIRST, LET'S EAT</span><h2 id="restaurant-title">어디서 밥 먹을까?</h2></div><Utensils className="heading-icon" size={22} /></div>
         <div className="restaurant-grid">{restaurants.map((place) => <button type="button" key={place.id} onClick={() => setRestaurant(place.id)} className={`restaurant-card ${restaurant === place.id ? 'selected' : ''} ${place.featured ? 'featured' : ''}`} aria-pressed={restaurant === place.id}>
@@ -64,7 +95,7 @@ function VotingPage() {
         <div className="choice-row"><button type="button" className={`pill-choice ${movie === true ? 'active' : ''}`} aria-pressed={movie === true} onClick={() => setMovie(true)}>🎬 좋아, 보자!</button><button type="button" className={`pill-choice ${movie === false ? 'active' : ''}`} aria-pressed={movie === false} onClick={() => setMovie(false)}>🌿 밥 먹고 정하자</button></div>
       </section>
       <section className="selection-section comment-section"><label className="section-heading" htmlFor="comment"><div className="section-number">03</div><div><span className="section-kicker">A LITTLE NOTE</span><h2>하고 싶은 말 있어?</h2></div><MessageCircle className="heading-icon" size={21} /></label><textarea id="comment" maxLength={300} rows={3} value={comment} onChange={(event) => setComment(event.target.value)} placeholder="시간이나 먹고 싶은 메뉴도 좋아! (선택)" /><div className="char-count">{comment.length} / 300</div></section>
-      <section className="review-card"><div className="review-heading"><span className="review-spark">✦</span><strong>우리의 데이트 코스</strong><span className="review-caption">최종 확인</span></div><div className="review-line"><span>🍽️ 식사</span><strong>{restaurantById.get(restaurant)?.name}</strong></div><div className="review-line"><span>🎞️ 영화</span><strong>{movie === null ? '선택 전' : movie ? '치이카와 극장판' : '이번엔 패스'}</strong></div><div className="review-divider"/><button className="submit-button" type="submit" disabled={busy}>{busy ? '보내는 중…' : <>선택 보내기 <Send size={16} /></>}</button>{error && <p className="error-message" role="alert">{error}</p>}<p className="privacy-note"><LockKeyhole size={11} /> 선택은 우리 둘만 볼 수 있어</p></section>
+      <section className="review-card"><div className="review-heading"><span className="review-spark">✦</span><strong>우리의 데이트 코스</strong><span className="review-caption">최종 확인</span></div><div className="review-line"><span>🍽️ 식사</span><strong>{restaurantById.get(restaurant)?.name}</strong></div><div className="review-line"><span>🎞️ 영화</span><strong>{movie === null ? '선택 전' : movie ? '치이카와 극장판' : '이번엔 패스'}</strong></div><ItineraryTimeline restaurantId={restaurant} movie={movie} /><div className="review-divider"/><button className="submit-button" type="submit" disabled={busy}>{busy ? '보내는 중…' : <>선택 보내기 <Send size={16} /></>}</button>{error && <p className="error-message" role="alert">{error}</p>}<p className="privacy-note"><LockKeyhole size={11} /> 선택은 우리 둘만 볼 수 있어</p></section>
     </form>}
     <footer className="page-footer"><span>made with <Heart size={11} fill="currentColor" /> for us</span><a href={`${homeUrl}?admin=1`}>관리자</a></footer>
   </main>
