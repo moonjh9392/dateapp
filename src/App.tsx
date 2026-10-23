@@ -9,9 +9,9 @@ type ResponseRow = { id: string; restaurant_id: string; movie: boolean; comment:
 
 const restaurants: Restaurant[] = [
   { id: 'badagot', name: '바다곶', category: '활고등어회 · 제철 모둠회', description: '신선한 활고등어회가 대표 메뉴', emoji: '🌊', walkMinutes: null, featured: true },
-  { id: 'moseon', name: '모선', category: '숙성 연어 · 초밥', description: '연어덮밥과 연어 초밥 전문', emoji: '🍣', walkMinutes: 7 },
+  { id: 'moseon', name: '모선', category: '숙성 연어 · 초밥', description: '연어덮밥과 연어 초밥 전문', emoji: '🍣', walkMinutes: 8 },
   { id: 'yukhwatan', name: '육화탄 괴정점', category: '숙성 돼지고기구이', description: '24일 숙성 삼겹살과 목살', emoji: '🥩', walkMinutes: 2 },
-  { id: 'jackpasta', name: '잭파스타 & 커피', category: '뇨끼 · 파스타 · 커피', description: '파스타 먹고 커피까지 한 번에', emoji: '🍝', walkMinutes: 4 },
+  { id: 'jackpasta', name: '잭파스타 & 커피', category: '뇨끼 · 파스타 · 커피', description: '파스타 먹고 커피까지 한 번에', emoji: '🍝', walkMinutes: 2 },
 ]
 const restaurantById = new Map(restaurants.map((place) => [place.id, place]))
 const homeUrl = import.meta.env.BASE_URL
@@ -56,7 +56,7 @@ function VotingPage() {
         <div className="restaurant-grid">{restaurants.map((place) => <button type="button" key={place.id} onClick={() => setRestaurant(place.id)} className={`restaurant-card ${restaurant === place.id ? 'selected' : ''} ${place.featured ? 'featured' : ''}`} aria-pressed={restaurant === place.id}>
           <span className="restaurant-emoji">{place.emoji}</span><span className="restaurant-copy"><span className="restaurant-category">{place.category}</span><strong>{place.name}</strong><span className="restaurant-description">{place.description}</span><span className="restaurant-meta"><span className={`restaurant-rank ${place.featured ? 'first-pick' : ''}`}>{place.featured ? '우리 1픽' : '대안'}</span>{place.walkMinutes !== null && <span className="restaurant-walk">바다곶에서 도보 약 {place.walkMinutes}분</span>}</span></span><span className="radio-indicator">{restaurant === place.id && <Check size={13} strokeWidth={3} />}</span>
         </button>)}</div>
-        <div className="recommend-note"><span>✦</span> 바다곶이 오늘의 1순위야. 다른 곳이 끌리면 가까운 대안도 골라줘 💌</div>
+        <div className="recommend-note"><span>✦</span> 바다곶이 오늘의 1순위야. 도보 시간은 주소 기준 예상이야 💌</div>
       </section>
       <section className="selection-section movie-section" aria-labelledby="movie-title">
         <div className="section-heading"><div className="section-number">02</div><div><span className="section-kicker">AND THEN?</span><h2 id="movie-title">영화도 볼까?</h2></div><Popcorn className="heading-icon" size={22} /></div>
