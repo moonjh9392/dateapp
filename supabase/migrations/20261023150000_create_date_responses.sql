@@ -1,4 +1,4 @@
--- Run in Supabase SQL Editor as the project owner.
+-- Initial database migration for the date course picker.
 create table if not exists public.date_responses (
   id uuid primary key default gen_random_uuid(),
   restaurant_id text not null check (restaurant_id in ('badagot', 'moseon', 'yukhwatan', 'jackpasta')),
