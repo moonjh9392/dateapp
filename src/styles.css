@@ -31,3 +31,6 @@
 .itinerary-step.itinerary-muted .itinerary-dot{border-color:#cfc9be}
 .itinerary-note{margin:0;padding-left:64px;color:#aaa195;font:9px/1.5 'Gowun Dodum',sans-serif}
 .review-card .itinerary-card{margin-top:14px}
+.restaurant-card.fixed-place{cursor:default}
+.restaurant-card.fixed-place:disabled{opacity:1;color:#39352f}
+.restaurant-card.fixed-place:disabled:hover{transform:none;border-color:#dfb6a4}
